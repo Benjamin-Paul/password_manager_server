@@ -18,7 +18,7 @@ def connect():
         
 	# execute a statement
         print('PostgreSQL database version:')
-        cur.execute("SELECT first_name||' '||last_name, email FROM customer")
+        cur.execute("SELECT first_name||' '||last_name, email FROM customer ORDER BY last_name OFFSET 5 FETCH FIRST 10 ROW ONLY")
 
         # display the PostgreSQL database server version
         data_fetched = cur.fetchmany(10)

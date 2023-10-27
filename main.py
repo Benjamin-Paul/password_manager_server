@@ -7,7 +7,7 @@ import os
 import jwt
 import datetime as dt
 
-load_dotenv("/.env")
+load_dotenv(".env")
 
 app = Flask(__name__)
 params = config()
@@ -40,7 +40,6 @@ def token_required(fn):
     def decorated(*args, **kwargs):
         if "token" in request.form:
             token = request.form["token"]
-            print(token)
             try: 
                 data = jwt.decode(token, app.jwt_signing_key, algorithms="HS256")
                 current_user = User.query.filter_by(user=data["user"]).first()

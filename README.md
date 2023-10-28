@@ -1,4 +1,4 @@
-*This is an educational project, users assume full responsibility for any issues that may arise during real-life use.*
+*This is an educational project, and users should assume full responsibility for any issues that may arise during real-life use.*
 
 
 # Presentation

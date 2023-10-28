@@ -56,7 +56,7 @@ python3 run.py
 
 # About security
 
-This server is designed to be as secure as possible : as such, it never stores users master passwords in any form. Instead, it uses a zero-proof knowledge algorithm to authentify clients. The passwords are then stored as encrypted strings that can only be decrypted on the client itself, since the server doesn't know anything about master passwords.
+This server is designed to be as secure as possible : as such, it never stores users master passwords in any form. Instead, it uses a zero-knowledge proof algorithm to authentify clients. The passwords are then stored as encrypted strings that can only be decrypted on the client itself, since the server doesn't know anything about master passwords.
 
 For more, check the corresponding client implementation. 
 

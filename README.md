@@ -32,7 +32,7 @@ database = postgres
 user = johndoe
 host = mysuperdatabase.com
 password = correct_horse_battery_staple
-port = 5433
+port = 5432
 ```
 
 Run the config.py script to create the tables in the database :

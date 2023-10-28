@@ -11,7 +11,7 @@ Through API endpoints implemented as Flask routes in the [routes](/app/routes.py
 
 It is designed to work off the shelf with a Postgresql database. Since it uses SQLALchemy, however, only a few changes to the [database](/app/database/) subpackage should suffice to make it work with other types of databases.
 
-The postgres database must be created indpendently. Once a databse exists, its connection details must be entered in the [database.ini](/app/database/database.ini.example) file. You can then run the [config.py](/config.py) script to automatically create the required tables in your database. The link between the server and the database is then handled through Flask-SQLAlchemy models defined in the [models](/app/models.py) module of the app package.
+The postgres database must be created indpendently. Once a database exists, its connection details must be entered in the [database.ini](/app/database/database.ini.example) file. You can then run the [config.py](/config.py) script to automatically create the required tables in your database. The link between the server and the database is then handled through Flask-SQLAlchemy models defined in the [models](/app/models.py) module of the app package.
 
 The server implements JWT for user authentication. Sessions are maintained for one hour after the token has been issued. See the [auth](/app/auth/) subpackage for details. Tokens are signed and verified with a secret key stored in the project [.env](/.env.example) file.
 

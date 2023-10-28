@@ -1,21 +1,47 @@
-#!/usr/bin/python
-from configparser import ConfigParser
+'''
+This configuration script can be executed to create the needed tables in an existing database.
+The database information should be specified in /app/database/database.ini
+'''
 
-DEFAULT_INIT_FILE_PATH = 'private/database.ini'
+import psycopg2
+from app.database.config import config 
 
-def config(filename=DEFAULT_INIT_FILE_PATH, section='postgresql'):
-    # create a parser
-    parser = ConfigParser()
-    # read config file
-    parser.read(filename)
+def create_tables():
+    # table creation commands in the PostgreSQL database
+    commands = [
+        """
+        CREATE TABLE safe (
+            owner SERIAL PRIMARY KEY,
+            site VARCHAR(255) NOT NULL,
+            username VARCHAR(255),
+            password VARCHAR(255) NOT NULL
+        )
+        """,
+        """
+        CREATE TABLE users (
+            "user" VARCHAR(255) PRIMARY KEY,
+            signature VARCHAR(255) NOT NULL
+        )
+        """]
+    conn = None
+    try:
+        # read the connection parameters
+        params = config()
+        # connect to the PostgreSQL server
+        conn = psycopg2.connect(**params)
+        cur = conn.cursor()
+        # create table one by one
+        for command in commands:
+            cur.execute(command)
+        # close communication with the PostgreSQL database server
+        cur.close()
+        # commit the changes
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
 
-    # get section, default to postgresql
-    db = {}
-    if parser.has_section(section):
-        params = parser.items(section)
-        for param in params:
-            db[param[0]] = param[1]
-    else:
-        raise Exception('Section {0} not found in the {1} file'.format(section, filename))
-
-    return db
+if __name__ == "__main__":
+    create_tables()

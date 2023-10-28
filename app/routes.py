@@ -1,39 +1,12 @@
-from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from config import config
+from flask import request, jsonify
 from functools import wraps
-from dotenv import load_dotenv
-import os
 import jwt
 import datetime as dt
 
-load_dotenv(".env")
 
-app = Flask(__name__)
-params = config()
-try:
-    uri = f"postgresql://{params['user']}:{params['password']}@{params['host']}:{params['port']}/{params['database']}"
-except:
-    print("fatal error. Unable to connect to database.")
-app.config['SQLALCHEMY_DATABASE_URI'] = uri
-app.jwt_signing_key = os.environ["JWT_KEY"]
+from app import app, db
+from app.models import User, Safe
 
-db = SQLAlchemy(app)
-
-class Safe(db.Model):
-    __tablename__ = 'safe'
-
-    site = db.Column(db.String)
-    username = db.Column(db.String)
-    password = db.Column(db.String)
-    owner = db.Column(db.String)
-    id = db.Column(db.Integer, primary_key=True)
-
-class User(db.Model):
-    __tablename__ = 'users'
-
-    user = db.Column(db.String, primary_key=True)
-    signature = db.Column(db.String)
 
 def token_required(fn):
     @wraps(fn)
@@ -147,7 +120,3 @@ def delete_entry(current_user):
     db.session.delete(entry_to_delete)
     db.session.commit()
     return f'Profile deleted for {request.form["site"]}.' 
-    
-
-if __name__ == '__main__':
-    app.run(debug=True)

@@ -1,0 +1,10 @@
+# This is the template for the .ini file
+# This file should be called database.ini in the actual project
+# It contains the values used to connect to the postgresql database
+
+[postgresql]
+database = <database_name>
+user = <database_username>
+host = <databse_uri>
+password = <database_password>
+port = <database_port>

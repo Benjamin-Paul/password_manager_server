@@ -8,15 +8,22 @@ Through API endpoints implemented as Flask routes in the [routes module of the a
 
 It is designed to work off the shelf with a Postgresql database. Since it uses SQLALchemy, however, only a few changes to [the database subpackage](/app/database/) should suffice to make it work with other types of databases.
 
-The postgres database must be created indpendently. Once a databse exists, its connection details must be entered in [the database.ini file](/app/database/database.ini.example). You can then run [the config.py script](/config.py) to automatically create the required tables in your database. The link between the server and the database is then handled through Flas-SQLAlchemy models defined in [the models module of the app package](/app/models.py).
+The postgres database must be created indpendently. Once a databse exists, its connection details must be entered in [the database.ini file](/app/database/database.ini.example). You can then run [the config.py script](/config.py) to automatically create the required tables in your database. The link between the server and the database is then handled through Flask-SQLAlchemy models defined in [the models module of the app package](/app/models.py).
 
 The server implements JWT for user authentication. Sessions are maintained for one hour after the token has been issued. See [the auth subpackage](/app/auth/) for details. Tokens are signed and verified with a secret key stored in [the project .env file](/.env.example).
 
+
 ## Getting strated 
 
-Enter your postgres database details in [the database.ini file](/app/database/database.ini.example).
+Install the project's requirements :
 
-```example
+```bash
+pip install -r requirements.txt
+```
+
+Enter your postgres database details in [the database.ini file](/app/database/database.ini.example). For example :
+
+```
 [postgresql]
 database = postgres
 user = johndoe
@@ -24,6 +31,25 @@ host = mysuperdatabase.com
 password = correct_horse_battery_staple
 port = 5433
 ```
+
+Run the config.py script to create the tables in the database :
+
+```bash
+python3 conifg.py
+```
+
+Rename the .env.example file to .env and add a long, random JWT signing key to it. For example (obvioulsy don't use this key) :
+
+```
+JWT_KEY="0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a"
+```
+
+Run the config.py script to create the tables in the database :
+
+```bash
+python3 conifg.py
+```
+
 
 ## About security
 

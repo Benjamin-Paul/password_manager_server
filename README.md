@@ -1,6 +1,3 @@
-*This is an educational project, and users should assume full responsibility for any issues that may arise during real-life use.*
-
-
 # Presentation
 
 This repository contains the code for a simple password manager server written in Python.

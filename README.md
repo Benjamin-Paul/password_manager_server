@@ -41,7 +41,7 @@ Run the config.py script to create the tables in the database :
 python3 conifg.py
 ```
 
-Rename the [.env example file](/.env.example). to .env and add a long, random JWT signing key to it. The file should look like this (obvioulsy don't use this key) :
+Rename the [.env example file](/.env.example). to .env and add a long, random JWT signing key to it. For optimal security, make sure you create a cryptographically strong key, for example with the built-in Python [sercets module](https://docs.python.org/3/library/secrets.html). The file should look like this (obvioulsy don't use this key) :
 
 ```
 JWT_KEY="0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a"

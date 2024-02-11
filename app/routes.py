@@ -3,7 +3,6 @@ from functools import wraps
 import jwt
 import datetime as dt
 
-
 from app import app, db
 from app.models import User, Safe
 

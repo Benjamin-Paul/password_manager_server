@@ -1,7 +1,5 @@
 # Custom folders and files for this project
 database.ini
-private/
-__pycache__/
 .venv/
 .env
 

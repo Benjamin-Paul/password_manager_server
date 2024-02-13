@@ -5,7 +5,7 @@
 
 This repository contains the code for a simple password manager server written in Python.
 
-The sevrer, at its core, is a Flask API contained in the [app](/app/) package.
+The server, at its core, is a Flask API, implemented in the [app](/app/) package.
 
 Through API endpoints implemented as Flask routes in the [routes](/app/routes.py) module of the app package, it allows for user registration (/register), user login (/login), encrypted password storage (/add), vaulted password retrieval (/get), vaulted password modification (/change) and vaulted password deletion (/delete). 
 

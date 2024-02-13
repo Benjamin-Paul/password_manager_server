@@ -1,29 +1,16 @@
 from flask import request, jsonify
-from functools import wraps
 import jwt
 import datetime as dt
+import pickle
+import json
+from collections import namedtuple
 
+from noknow import ZK, ZKSignature, ZKData
 
 from app import app, db
 from app.models import User, Safe
-
-
-def token_required(fn):
-    @wraps(fn)
-    def decorated(*args, **kwargs):
-        if "token" in request.form:
-            token = request.form["token"]
-            try: 
-                data = jwt.decode(token, app.jwt_signing_key, algorithms="HS256")
-                current_user = User.query.filter_by(user=data["user"]).first()
-            except jwt.ExpiredSignatureError:
-                return "Your sessions has expired."
-            except jwt.DecodeError:
-                return "Access denied."
-            return fn(current_user, *args, **kwargs)
-        else:
-            return "Provide username and token to authenticate yourself."
-    return decorated
+from app.auth.jwt import token_required
+from app.auth.zk_auth import create_server_signature, create_zk_instance, send_random_token, process_proof
 
 @app.route("/register", methods=["POST"])
 def register():
@@ -36,49 +23,72 @@ def register():
         user = User.query.filter_by(user=user_name).first()
         # TODO add email for recovery and identity check
         if user is not None:
-            return "This user already exists."
+            return jsonify(success=False, content="This user already exists.")
         db.session.add(new_user)
         db.session.commit()
-        return f"New user added : {user_name}. Don't forget your passphrase."
+        return jsonify(success=True, content=f"New user added : {user_name}.")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():       
-    if "secret" and "user" in request.form:
-        secret = request.form["secret"]
+    if "user" in request.form:
         user_name = request.form["user"]
         user = User.query.filter_by(user=user_name).first()
         if user is None:
-            return "Wrong credentials (user doesn't exist)."
-        # TODO implement secret zero-knowledge verification 
-        if secret != "good secret":
-            return "Wrong credentials (wrong password)."
+            return jsonify(success=False, content="Wrong credentials.")
         if "token" in request.form:
             try:
                 data = jwt.decode(request.form["token"], app.jwt_signing_key, algorithms="HS256")
                 if data["user"] == user_name:
-                    return "You're already logged in."
+                    return jsonify(success=False, content="You're already logged in.")
             except:
                 pass
+        # zero-knowledge proof verification
+        client_signature = user.signature.strip("\"")
+        client_signature = ZKSignature.load(client_signature)
+        zk_server, server_signature = create_server_signature()
+        zk_client = create_zk_instance(client_signature)
+        signa_str = json.dumps(server_signature.dump())
+        user.serversignature = signa_str
         db.session.commit()
-        token = jwt.encode({'user': user_name, 'exp': dt.datetime.utcnow() + dt.timedelta(hours=1)}, app.jwt_signing_key)
-        return jsonify({'token': token})
-    return "Provide a POST request with secret and username values."
+        print(client_signature.dump())
+        print(type(client_signature.dump()))
+        return jsonify(success=True, content=send_random_token(zk_server, zk_client), sig=client_signature.dump())
+    return jsonify(success=False, content="Provide a POST request with a username value.")
+
+@app.route("/proof", methods=["POST"])
+def proof():
+    if "user" in request.form:
+        user_name = request.form["user"]
+        user = User.query.filter_by(user=user_name).first()
+        if user is None:
+            return jsonify(success=False, content="Wrong credentials.")
+        else:
+            proof = request.form["proof"]
+            server_signature = ZKSignature.load(user.serversignature.strip("\""))
+            zk_server = ZK(server_signature.params)
+            client_signature = user.signature.strip("\"")
+            client_signature = ZKSignature.load(client_signature)
+            zk_client = ZK(client_signature.params)
+            if process_proof(proof, zk_server, server_signature, zk_client, client_signature):
+                jwt_token = jwt.encode({'user': user_name, 'exp': dt.datetime.utcnow() + dt.timedelta(hours=1)}, app.jwt_signing_key)
+                return jsonify(success=True, content=jwt_token)
+            else:
+                return jsonify(success=False, content="Wrong credentials.")
 
 @app.route("/get", methods=["POST"])
 @token_required
 def get_password(current_user):
-    if current_user.user != request.form["user"]:
-        return "Access denied."
     user_rows = Safe.query.filter_by(owner=current_user.user).all()
     list_of_sites = []
     for row in user_rows:
         list_of_sites.append(row.site)
     if "site" not in request.form:
-        return jsonify({"sites": list_of_sites})
+        return jsonify(success=True, content=list_of_sites)
     requested_site = request.form["site"]
     if requested_site in list_of_sites:
-        return Safe.query.filter_by(owner=current_user.user, site=requested_site).first().password
-    return jsonify("The site you requested doesn't exist.", {"sites": list_of_sites})
+        row_fetched = Safe.query.filter_by(owner=current_user.user, site=requested_site).first()
+        return jsonify(success=True, content=[row_fetched.password, row_fetched.username])
+    return jsonify(success=True, content=list_of_sites)
 
 @app.route("/add", methods=["POST"])
 @token_required

@@ -11,10 +11,11 @@ def create_tables():
     commands = [
         """
         CREATE TABLE safe (
-            owner SERIAL PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             site VARCHAR(255) NOT NULL,
             username VARCHAR(255),
-            password VARCHAR(255) NOT NULL
+            password VARCHAR(255) NOT NULL,
+            owner VARCHAR(255) NOT NULL
         )
         """,
         """

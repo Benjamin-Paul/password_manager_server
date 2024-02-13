@@ -3,6 +3,7 @@ from app import db
 class Safe(db.Model):
     __tablename__ = 'safe'
 
+    #TODO modify database to host nonce and tag for decryption
     site = db.Column(db.String)
     username = db.Column(db.String)
     password = db.Column(db.String)
@@ -14,3 +15,4 @@ class User(db.Model):
 
     user = db.Column(db.String, primary_key=True)
     signature = db.Column(db.String)
+    serversignature = db.Column(db.String)

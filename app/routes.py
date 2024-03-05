@@ -5,11 +5,8 @@ import pickle
 import json
 from collections import namedtuple
 
-<<<<<<< HEAD
 from noknow import ZK, ZKSignature, ZKData
 
-=======
->>>>>>> d230e28fff16219f89c4a88c5008a654be78f1f1
 from app import app, db
 from app.models import User, Safe
 from app.auth.jwt import token_required
